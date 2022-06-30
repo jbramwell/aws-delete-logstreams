@@ -103,6 +103,8 @@ for log_group in log_groups['logGroups']:
                     # Apparently some log streams don't have last ingestion times
                     if ('lastIngestionTime' in stream):
                         last_ingestion_timestamp = stream['lastIngestionTime']
+
+                        # Convert to a date/time for comparison
                         last_ingestion_time = datetime.fromtimestamp(
                             stream['lastIngestionTime']/1000)
                     else:
