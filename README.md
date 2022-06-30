@@ -1,7 +1,8 @@
-# aws-delete-logstreams
-Delete log streams from an AWS account based on age (in days) and name filter.
+# Usage
 
-Usage: aws-del-logstreams.py [-h] [-p PROFILE] [-v] [-d] [-m MAXDAYS] [-r REGION] [-n NAME]
+Deletes log streams from an AWS account based on age (in days) and name filter.
+
+Usage: ```aws-del-logstreams.py [-h] [-p PROFILE] [-v] [-d] [-m MAXDAYS] [-r REGION] [-n NAME]```
 
 | switch |           | description |
 |--------|-----------|:------------|
