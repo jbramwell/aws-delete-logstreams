@@ -3,7 +3,7 @@ Delete log streams from an AWS account based on age (in days) and name filter.
 
 Usage:
 | switch |           | description |
-|--------|-----------|-------------|
+|--------|-----------|:------------|
 | -h     | --help    | Show this help message and exit     |
 | -p     | --profile | Specifies the AWS profile (from credentials file) to be used. |
 | -v     | --verbose | Verbose output. |
