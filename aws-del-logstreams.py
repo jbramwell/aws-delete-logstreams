@@ -67,6 +67,9 @@ client = aws_account.session.client('logs')
 
 # Get the initial list of log groups (only the first n groups are returned)
 log_groups = client.describe_log_groups()
+log_groups_paginator = client.get_paginator('describe_log_groups')
+log_groups_iterator = log_groups_paginator.paginate()
+
 total_log_groups_count = 0
 total_log_stream_count = 0
 total_log_streams_flagged = 0
@@ -74,11 +77,12 @@ total_log_streams_flagged = 0
 if (args.verbose):
     print("===== BEGIN CSV FORMAT =====")
 
-for log_group in log_groups['logGroups']:
-    log_group_name = log_group['logGroupName']
+#for log_group in log_groups['logGroups']:
+for log_groups in log_groups_iterator:
+    for log_group in log_groups["logGroups"]:
+        log_group_name = log_group['logGroupName']
 
-    # If the log group doesn't have any stored data, no point continuing with this group
-    if(log_group['storedBytes'] > 0):
+        # If the log group doesn't have any stored data, no point continuing with this group
         if (args.name.lower() in log_group_name.lower()):
             total_log_groups_count += 1
             next_token = None
@@ -114,7 +118,7 @@ for log_group in log_groups['logGroups']:
 
                     if (last_ingestion_time):
                         age_in_days = (datetime.today() -
-                                       last_ingestion_time).days
+                                        last_ingestion_time).days
                     else:
                         # We've ran into an edge case where there is no ingestion date
                         # present, so we skip these to be safe
