@@ -65,8 +65,6 @@ display_startup_parameters(args, aws_account)
 
 client = aws_account.session.client('logs')
 
-# Get the initial list of log groups (only the first n groups are returned)
-log_groups = client.describe_log_groups()
 log_groups_paginator = client.get_paginator('describe_log_groups')
 log_groups_iterator = log_groups_paginator.paginate()
 
@@ -87,19 +85,10 @@ for log_groups in log_groups_iterator:
             total_log_groups_count += 1
             next_token = None
 
-            while True:
-                if next_token:
-                    # Making subsequent calls to the same log group
-                    log_streams = client.describe_log_streams(
-                        logGroupName=log_group_name, nextToken=next_token)
-                else:
-                    # First time around for this log group
-                    log_streams = client.describe_log_streams(
-                        logGroupName=log_group_name)
+            log_streams_paginator = client.get_paginator('describe_log_streams')
+            log_streams_iterator = log_streams_paginator.paginate(logGroupName=log_group_name)
 
-                # Get the next log streams token
-                next_token = log_streams.get('nextToken', None)
-
+            for log_streams in log_streams_iterator:
                 for stream in log_streams['logStreams']:
                     total_log_stream_count += 1
                     log_stream_name = stream['logStreamName']
@@ -113,8 +102,6 @@ for log_groups in log_groups_iterator:
                             stream['lastIngestionTime']/1000)
                     else:
                         last_ingestion_time = None
-
-                    stored_bytes = stream['storedBytes']
 
                     if (last_ingestion_time):
                         age_in_days = (datetime.today() -
@@ -137,10 +124,6 @@ for log_groups in log_groups_iterator:
                         if (args.delete):
                             client.delete_log_stream(
                                 logGroupName=log_group_name, logStreamName=log_stream_name)
-
-                # Have we reached the last log stream?
-                if (not next_token or len(log_streams['logStreams']) == 0):
-                    break
 
 if (args.verbose):
     print("===== END CSV FORMAT =====")
